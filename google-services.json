@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "161080157981",
+    "firebase_url": "https://quizgame-1935d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "quizgame-1935d",
+    "storage_bucket": "quizgame-1935d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:161080157981:android:e626e4fb32bff95bf763f4",
+        "android_client_info": {
+          "package_name": "com.isen.QuizGame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA5bG-TxUApB51ROdO9cfj-syyw6lurp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
