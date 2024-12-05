@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sous_titre: {
-        color: '#757575',
+        color: 'red',
         textAlign: 'center',
         fontSize: wp('2%'),
         paddingTop: wp('2%'),
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     titre: {
-        color: 'red',
+        color: '#333333',
         fontWeight: 'bold',
         fontSize: wp('8%'),
     },
