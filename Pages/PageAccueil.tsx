@@ -3,8 +3,9 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { get, ref } from 'firebase/database';
 import { db } from '../firebaseConfig';
-import { Platform } from 'react-native';
+import { Platform, Dimensions } from 'react-native';
 
+const {width} = Dimensions.get('window');
 
 const Page_Accueil: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [valeur, setvaleur] = useState('');
@@ -43,7 +44,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5F5F5',
         alignItems: 'center',
-        paddingTop: hp('5%'),
+        paddingTop: Platform.OS === 'web' && width >= 768 ? hp('5%') :  hp('20%'),
+        
     },
     titre: {
         color: '#333333',
