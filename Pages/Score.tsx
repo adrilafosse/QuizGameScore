@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { get, ref, onValue } from 'firebase/database';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { get, ref } from 'firebase/database';
 import { db } from '../firebaseConfig';
 import { useRoute } from '@react-navigation/native';
 import { Platform, Dimensions } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 
 const {width} = Dimensions.get('window');
 
@@ -19,6 +20,10 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [dateQuestion, setDateQuestion] = useState([]);
     const [question, setQuestion] = useState('');
     const [bonneReponse, setBonneReponse] = useState('');
+    const [nouvelleQuestion, setNouvelleQuestion] = useState(false);
+    const [QRcode, setQRcode] = useState(false);
+    const uniqueId = valeur;
+    const qrcode = `https://quizgame-mv6pbo6mya-ew.a.run.app?id=${uniqueId}}`;
 
     useEffect(() => {
         get(ref(db, `${valeur}/question-temps`)).then((snapshot) => {
@@ -55,27 +60,57 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             setQuestion(data.question);
-                            setBonneReponse(data.reponse1)
+                            setBonneReponse(data.reponse1);
+                            setNouvelleQuestion(false);
                         }
                     });
                 }, delay);
             } else {
                 console.log('La date est déjà passée');
             }
+            const delay2 = date.getTime() - Date.now();
+            if(delay2 > 0){
+                setTimeout(() => {
+                    setNouvelleQuestion(true);
+                }, delay2);
+            }
         });
       }, [dateQuestion]);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.titre}>Score</Text>
-            {question !== '' && bonneReponse !== '' ? (
-                <Text style={styles.sous_titre}>{question} : {bonneReponse}</Text>
-            ) : null}
-            {dataTableau.map((item, index) => (
-                <View key={item.name} style={styles.rankItem}>
-                    <Text style={styles.rankText}>{index + 1}. {item.name} - {item.score} pts</Text>
-                </View>
-            ))}
+            {nouvelleQuestion === true ? (
+                <Text style={styles.titre}>Une nouvelle question est apparue !</Text>
+            ) :
+            <>
+                { QRcode === false ? (
+                <>
+                <Text style={styles.titre}>Score</Text>
+                {question !== '' && bonneReponse !== '' ? (
+                    <Text style={styles.sous_titre}>{question} : {bonneReponse}</Text>
+                ) : null}
+                {dataTableau.map((item, index) => (
+                    <View key={item.name} style={styles.rankItem}>
+                        <Text style={styles.rankText}>{index + 1}. {item.name} - {item.score} pts</Text>
+                    </View>
+                ))}
+                <TouchableOpacity style={styles.bouton2} onPress={() => setQRcode(true)}>
+                    <Text style={styles.boutonText}>Afficher le QRcode de la partie</Text>
+                </TouchableOpacity>
+                </>
+                ) : 
+                <>
+                  <Text style={styles.titre}>Pour rejoindre la partie tout nouveau joueur peut scanner ce QRcode :</Text>
+                  <View style={styles.qrContainer}>
+                    <QRCode value={qrcode} size={Platform.OS === 'web' && width >= 768 ? wp('20%') :  hp('40%')} />
+                  </View>
+                  <TouchableOpacity style={styles.bouton2} onPress={() => setQRcode(false)}>
+                    <Text style={styles.boutonText}>Retour</Text>
+                  </TouchableOpacity>
+                </>
+                }
+            </>
+            }
         </View>
     )
 };
@@ -86,6 +121,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: Platform.OS === 'web' && width >= 768 ? wp('1%') :  wp('2%'),
     },
+    bouton2: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: hp('2%'),
+        paddingHorizontal: wp('10%'),
+        borderRadius: 8,
+        marginTop: Platform.OS === 'web' && width >= 768 ? wp('2%') : wp('8%'),
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      qrContainer: {
+        marginVertical: Platform.OS === 'web' && width >= 768 ? hp('5%') :  hp('2%'),
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      boutonText: {
+        color: '#FFFFFF',
+        fontSize:  Platform.OS === 'web' && width >= 768 ? wp('1.5%') : wp('4%'),
+        fontWeight: 'bold',
+      },
     sous_titre: {
         color: 'red',
         textAlign: 'center',
