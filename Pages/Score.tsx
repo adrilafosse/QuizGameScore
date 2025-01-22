@@ -23,7 +23,7 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [nouvelleQuestion, setNouvelleQuestion] = useState(false);
     const [QRcode, setQRcode] = useState(false);
     const uniqueId = valeur;
-    const qrcode = `https://quizgame-mv6pbo6mya-ew.a.run.app?id=${uniqueId}}`;
+    const qrcode = `https://storage.googleapis.com/quizgame/web-build/index.html?id=${uniqueId}`;
 
     useEffect(() => {
         get(ref(db, `${valeur}/question-temps`)).then((snapshot) => {
@@ -83,7 +83,7 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={styles.titre}>Une nouvelle question est apparue !</Text>
             ) :
             <>
-                { QRcode === false ? (
+                { QRcode === false &&  question === '' ? (
                 <>
                 <Text style={styles.titre}>Score</Text>
                 {question !== '' && bonneReponse !== '' ? (
@@ -94,9 +94,11 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
                         <Text style={styles.rankText}>{index + 1}. {item.name} - {item.score} pts</Text>
                     </View>
                 ))}
+                {question === '' ? (
                 <TouchableOpacity style={styles.bouton2} onPress={() => setQRcode(true)}>
                     <Text style={styles.boutonText}>Afficher le QRcode de la partie</Text>
                 </TouchableOpacity>
+                ) : null}
                 </>
                 ) : 
                 <>
