@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { get, ref } from 'firebase/database';
-import { db } from '../firebaseConfig';
+import { dbFirestore, db } from '../firebaseConfig';
 import { useRoute } from '@react-navigation/native';
 import { Platform, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import { doc, getDoc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
@@ -25,16 +26,24 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     const uniqueId = valeur;
     const qrcode = `https://storage.googleapis.com/quizgame/index.html?id=${uniqueId}`;
     useEffect(() => {
-        get(ref(db, `${valeur}/question-temps`)).then((snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                const dataFormatter = Object.entries(data).map(([key, value]) => ({
-                    question: key,
-                    date: value
-                }));
-                setDateQuestion(dataFormatter);
+        const Scores = async () => {
+            try {
+                const docRef = doc(dbFirestore, `${valeur}/score`);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const scoresData = docSnap.data();
+                    const dataArray = Object.entries(scoresData)
+                        .map(([name, score]) => ({ name, score: Number(score) }))
+                        .sort((a, b) => b.score - a.score);
+                    setDataTableau(dataArray);
+                } else {
+                    console.log('Aucune donnée trouvée !');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des scores depuis Firestore:', error);
             }
-        });
+        }
+        Scores();
     }, []);
 
     useEffect(() => {
