@@ -25,26 +25,6 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [QRcode, setQRcode] = useState(false);
     const uniqueId = valeur;
     const qrcode = `https://storage.googleapis.com/quizgame/index.html?id=${uniqueId}`;
-    useEffect(() => {
-        const Scores = async () => {
-            try {
-                const docRef = doc(dbFirestore, `${valeur}/score`);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const scoresData = docSnap.data();
-                    const dataArray = Object.entries(scoresData)
-                        .map(([name, score]) => ({ name, score: Number(score) }))
-                        .sort((a, b) => b.score - a.score);
-                    setDataTableau(dataArray);
-                } else {
-                    console.log('Aucune donnée trouvée !');
-                }
-            } catch (error) {
-                console.error('Erreur lors de la récupération des scores depuis Firestore:', error);
-            }
-        }
-        Scores();
-    }, []);
 
     useEffect(() => {
         get(ref(db, `${valeur}/question-temps`)).then((snapshot) => {
@@ -73,6 +53,24 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
                             setNouvelleQuestion(false);
                         }
                     });
+                    const Scores = async () => {
+                        try {
+                            const docRef = doc(dbFirestore, `${valeur}/score`);
+                            const docSnap = await getDoc(docRef);
+                            if (docSnap.exists()) {
+                                const scoresData = docSnap.data();
+                                const dataArray = Object.entries(scoresData)
+                                    .map(([name, score]) => ({ name, score: Number(score) }))
+                                    .sort((a, b) => b.score - a.score);
+                                setDataTableau(dataArray);
+                            } else {
+                                console.log('Aucune donnée trouvée !');
+                            }
+                        } catch (error) {
+                            console.error('Erreur lors de la récupération des scores depuis Firestore:', error);
+                        }
+                    }
+                    Scores();
                 }, delay);
             } else {
                 console.log('La date est déjà passée');
@@ -89,10 +87,10 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <View style={styles.container}>
             {nouvelleQuestion === true ? (
-                <Text style={styles.titre}>Une nouvelle question est apparue !</Text>
+                <Text style={styles.titre2}>Une nouvelle question est apparue !</Text>
             ) :
                 <>
-                    {QRcode === false && question === '' ? (
+                    {QRcode === false ? (
                         <>
                             <Text style={styles.titre}>Score</Text>
                             {question !== '' && bonneReponse !== '' ? (
@@ -179,6 +177,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     titre: {
+        color: '#333333',
+        fontWeight: 'bold',
+        fontSize: Platform.OS === 'web' && width >= 768 ? wp('3%') : wp('8%'),
+    },
+    titre2: {
+        paddingTop: wp('10%'),
         color: '#333333',
         fontWeight: 'bold',
         fontSize: Platform.OS === 'web' && width >= 768 ? wp('3%') : wp('8%'),
