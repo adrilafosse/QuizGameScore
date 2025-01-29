@@ -47,23 +47,24 @@ const Score: React.FC<{ navigation: any }> = ({ navigation }) => {
     }, []);
 
     useEffect(() => {
+        get(ref(db, `${valeur}/question-temps`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const dataFormatter = Object.entries(data).map(([key, value]) => ({
+                    question: key,
+                    date: value
+                }));
+                setDateQuestion(dataFormatter);
+            }
+        });
+    }, []);
+    useEffect(() => {
         dateQuestion.forEach((dateStr) => {
             const date = new Date(dateStr.date);
             const delay = date.getTime() + 120000 - Date.now();
             if (delay > 0) {
                 //setTimeout se declenche quand delay arrive a 0
                 setTimeout(() => {
-                    get(ref(db, `${valeur}/score`)).then((snapshot) => {
-                        if (snapshot.exists()) {
-                            const nouvelleDonnee = snapshot.val();
-                            const dataArray = Object.entries(nouvelleDonnee)
-                                .map(([name, score]) => ({ name, score: Number(score) }))
-                                .sort((a, b) => b.score - a.score);
-                            setDataTableau(dataArray);
-                        } else {
-                            console.log('Aucune donnée trouvée !');
-                        }
-                    });
                     get(ref(db, `${valeur}/question_reponse/${dateStr.question}`)).then((snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
